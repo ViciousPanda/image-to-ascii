@@ -1,6 +1,19 @@
 import os
+import sys
+
+# import function that sorts a string on character density
+from char_density import char_density_sort
+
+# import linked list
 from node import LinkedImage
+
+# Import an image processing tool
 from PIL import Image
+
+
+# clear screen
+def cls():
+    os.system("cls" if os.name == "nt" else "clear")
 
 
 # returns the relative path of the asset folder
@@ -33,19 +46,12 @@ def make_bnw(image):
     return image_list
 
 
-def make_ascii(image):
+def make_ascii(image, string):
     width = image.width
     height = image.height
     image_list = LinkedImage(width, height)
-    # different ascii strings
-    # ascii_string = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi\{C\}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@"
-    # ascii_string = ("$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1\{\}[]?-_+~<>i!lI;:,\"^`'.")
-    ascii_string = " .:-=+*#%@"
-    # ascii_string = "`.:~=+o*%8&#@O"
-    # ascii_string = "-=+*"
-    # ascii_string = ""
+    ascii_string = char_density_sort(string)
     ascii_length = len(ascii_string)
-
     for n in image:
         i = round(ascii_length * n.value / 256)
         # insert the char in ascii_string in index value * character spacing
@@ -54,11 +60,11 @@ def make_ascii(image):
 
 
 def print_img(image):
+    cls()
     width = image.width
     height = image.height
     print("\n image width = {}, image height = {} \n".format(width, height))
     width_count = 1
-
     for n in image.get_all_nodes():
         print(n.value, end="")
         if width_count == width:
@@ -78,20 +84,43 @@ def peek(image):
             return None
 
 
+def user_input():
+    usr_input = None
+    while not usr_input:
+        usr_input = input("input: ")
+    return usr_input
+
+
+def ascii_menu():
+    print("\n 1 for default long string")
+    print(" 2 for default short string")
+    print(" Anything else to create your own input")
+    print(" Q to quit")
+    usr_input = user_input()
+    cls()
+
+    if usr_input.upper() == "Q":
+        sys.exit(0)
+    elif usr_input == "1":
+        return "  `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi\{{}C{}}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@"
+    elif usr_input == "2":
+        return " .:-=+*#%@"
+    else:
+        return usr_input
+
+
 def main():
-    img = Image.open(asset_path("img_6.jpg"))
+    cls()
+    img = Image.open(asset_path("img_5.jpg"))
     width, height = img.size
     pixel_matrix = img.getdata()
 
     colour_matrix = image_to_matrix(pixel_matrix, width, height)
     bnw_matrix = make_bnw(colour_matrix)
-    ascii_matrix = make_ascii(bnw_matrix)
-
-    peek(colour_matrix)
-    peek(bnw_matrix)
-    peek(ascii_matrix)
-
-    print_img(ascii_matrix)
+    while True:
+        ascii_string = ascii_menu()
+        ascii_matrix = make_ascii(bnw_matrix, ascii_string)
+        print_img(ascii_matrix)
 
 
 if __name__ == "__main__":
@@ -100,19 +129,14 @@ else:
     print("Image is being imported")
 
 
-# for n in colour_matrix:
-# print(n.value)
-
-# print(str(colour_matrix.length))
-
 """
 
-print(str(colour_matrix.width))
-
-bnw_matrix = make_bnw(colour_matrix)
-ascii_matrix = make_ascii(bnw_matrix)
-
-print_img(ascii_matrix)
-
-
+    # different ascii strings
+    # ascii_string = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi\{C\}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@"
+    # ascii_string = ("$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1\{\}[]?-_+~<>i!lI;:,\"^`'.")
+    # ascii_string = " .:-=+*#%@"
+    # ascii_string = "`.:~=+o*%8&#@O"
+    # ascii_string = "-=+*"
+    # ascii_string = ""
+    
 """
