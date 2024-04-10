@@ -1,65 +1,118 @@
 import os
+from node import LinkedImage
 from PIL import Image
 
+
 # returns the relative path of the asset folder
-
-
 def asset_path(filename):
     script_dir = os.path.dirname(__file__)
     rel_path = "assets/" + filename
     return os.path.join(script_dir, rel_path)
 
 
+# adds the image pixel matrix to the Image Linked List
 def image_to_matrix(image, width, height):
-    matrix = []
-    for x in range(width):
-        matrix.append([])
-        for y in range(height):
-            matrix[x].append(image[y * width + x])
-    return matrix
+    image_list = LinkedImage(width, height)
+    for y in range(height):
+        for x in range(width):
+            # insert last pixel first, so it lands at the back of the linked list
+            image_list.insert_beginning(image[(width * height) - (y * width) - (x + 1)])
+    return image_list
 
 
+# conversts (averages) the RGB Image Linked List into a monochrome Image Linked List
 def make_bnw(image):
-    bnw_matrix = []
-    for x in range(len(image[0])):
-        bnw_matrix.append([])
-        for y in range(len(image)):
-            sum_rgb = image[y][x][0] + image[y][x][1] + image[y][x][2]
-            average_pixel = round(sum_rgb / 3)
-            bnw_matrix[x].append(average_pixel)
-    return bnw_matrix
+    width = image.width
+    height = image.height
+    image_list = LinkedImage(width, height)
+    for n in image:
+        r, g, b = n.value
+        sum_rgb = r + g + b
+        average_rgb = round(sum_rgb / 3)
+        image_list.insert_beginning(average_rgb)
+    return image_list
 
 
 def make_ascii(image):
-    ascii_matrix = []
+    width = image.width
+    height = image.height
+    image_list = LinkedImage(width, height)
+    # different ascii strings
     # ascii_string = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi\{C\}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@"
-    # ascii_string = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1\{\}[]?-_+~<>i!lI;:,\"^`'."
-    # ascii_string = " .:-=+*#%@"
+    # ascii_string = ("$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1\{\}[]?-_+~<>i!lI;:,\"^`'.")
+    ascii_string = " .:-=+*#%@"
     # ascii_string = "`.:~=+o*%8&#@O"
-    ascii_string = "-+/=*"
-
+    # ascii_string = "-=+*"
+    # ascii_string = ""
     ascii_length = len(ascii_string)
-    for x in range(len(image[0])):
-        ascii_matrix.append([])
-        for y in range(len(image)):
-            i = round(ascii_length * image[y][x] / 256)
-            ascii_matrix[x].append(ascii_string[i - 1] * 2)
-    return ascii_matrix
+
+    for n in image:
+        i = round(ascii_length * n.value / 256)
+        # insert the char in ascii_string in index value * character spacing
+        image_list.insert_beginning(ascii_string[i - 1] * 2)
+    return image_list
 
 
 def print_img(image):
-    for x in range(len(image[0])):
-        for y in range(len(image)):
-            print(image[y][x], end="")
-        print("")
+    width = image.width
+    height = image.height
+    print("\n image width = {}, image height = {} \n".format(width, height))
+    width_count = 1
+
+    for n in image.get_all_nodes():
+        print(n.value, end="")
+        if width_count == width:
+            print(" ")
+            width_count = 0
+        width_count += 1
+    return None
 
 
-img = Image.open(asset_path('img_5.jpg'))
-width, height = img.size
+def peek(image):
+    count = 5
+    for n in image.get_all_nodes():
+        print(n.value)
+        count -= 1
+        if count == 0:
+            print(" ")
+            return None
 
-pixel_matrix = img.getdata()
-colour_matrix = image_to_matrix(pixel_matrix, width, height)
+
+def main():
+    img = Image.open(asset_path("img_6.jpg"))
+    width, height = img.size
+    pixel_matrix = img.getdata()
+
+    colour_matrix = image_to_matrix(pixel_matrix, width, height)
+    bnw_matrix = make_bnw(colour_matrix)
+    ascii_matrix = make_ascii(bnw_matrix)
+
+    peek(colour_matrix)
+    peek(bnw_matrix)
+    peek(ascii_matrix)
+
+    print_img(ascii_matrix)
+
+
+if __name__ == "__main__":
+    main()
+else:
+    print("Image is being imported")
+
+
+# for n in colour_matrix:
+# print(n.value)
+
+# print(str(colour_matrix.length))
+
+"""
+
+print(str(colour_matrix.width))
+
 bnw_matrix = make_bnw(colour_matrix)
 ascii_matrix = make_ascii(bnw_matrix)
 
 print_img(ascii_matrix)
+
+
+"""
