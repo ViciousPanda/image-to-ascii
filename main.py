@@ -23,13 +23,25 @@ def asset_path(filename):
     return os.path.join(script_dir, rel_path)
 
 
-# adds the image pixel matrix to the Image Linked List and adds width and height to the instance
-def image_to_matrix(image, width, height):
-    image_list = LinkedImage(width, height)
-    for y in range(height):
-        for x in range(width):
+# resizes the image and adds the image pixel matrix to the Image Linked List
+def image_to_matrix(image, width, height, terminal_width=None):
+    new_width = width
+    new_height = height
+
+    if terminal_width and width > terminal_width:
+        new_width = terminal_width
+        new_height = round(height * terminal_width / width)
+
+    new_size = (new_width, new_height)
+    sized_image = image.resize(new_size)
+
+    image_list = LinkedImage(new_width, new_height)
+    for y in range(new_height):
+        for x in range(new_width):
             # insert last pixel first, so it lands at the back of the linked list
-            image_list.insert_beginning(image[(width * height) - (y * width) - (x + 1)])
+            image_list.insert_beginning(
+                sized_image[(new_width * new_height) - (y * new_width) - (x + 1)]
+            )
     return image_list
 
 
@@ -128,11 +140,11 @@ def ascii_menu():
 
 def main():
     cls()
-    img = Image.open(asset_path("img_5.jpg"))
+    img = Image.open(asset_path("img_6.jpg"))
     width, height = img.size
     pixel_matrix = img.getdata()
 
-    colour_matrix = image_to_matrix(pixel_matrix, width, height)
+    colour_matrix = image_to_matrix(pixel_matrix, width, height, 80)
     bnw_matrix = make_bnw(colour_matrix)
     while True:
         ascii_string = ascii_menu()
