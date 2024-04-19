@@ -19,11 +19,11 @@ def cls():
 # returns the relative path of the asset folder
 def asset_path(filename):
     script_dir = os.path.dirname(__file__)
-    rel_path = "assets/" + filename
+    rel_path = "images/" + filename
     return os.path.join(script_dir, rel_path)
 
 
-# adds the image pixel matrix to the Image Linked List
+# adds the image pixel matrix to the Image Linked List and adds width and height to the instance
 def image_to_matrix(image, width, height):
     image_list = LinkedImage(width, height)
     for y in range(height):
@@ -91,11 +91,28 @@ def user_input():
     return usr_input
 
 
+def image_menu():
+    return
+
+    """
+    select image
+        thumbnails
+        upload
+    select image size
+        default size: x
+        image size: x
+        large size: x
+    select image color / BnW
+    -> ascii menu
+    
+    """
+
+
 def ascii_menu():
-    print("\n 1 for default long string")
-    print(" 2 for default short string")
+    print("\n [1] for default long string")
+    print(" [2] for default short string")
     print(" Anything else to create your own input")
-    print(" Q to quit")
+    print(" [Q] to quit")
     usr_input = user_input()
     cls()
 
@@ -126,7 +143,7 @@ def main():
 if __name__ == "__main__":
     main()
 else:
-    print("Image is being imported")
+    print("Image is being processed")
 
 
 """
