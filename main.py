@@ -1,7 +1,7 @@
 import os
 import sys
 
-# import function that sorts a string on character density
+# import function that sorts a string based on character density
 from char_density import char_density_sort
 
 # import from asset folder
@@ -11,7 +11,11 @@ from assets import menu_dict
 from node import LinkedImage
 
 # Import an image processing tool
-from PIL import Image
+from PIL import Image as PImage
+
+# import custom image files
+from tkinter import filedialog
+from tkinter import *
 
 
 # select, resize and add the image to the linked list
@@ -26,17 +30,21 @@ class SelectImage:
         self.colour = True
         self.pixel_matrix = None
 
-    # returns the relative path of the asset folder
-    def asset_path(self, filename):
-        script_dir = os.path.dirname(__file__)
-        rel_path = "images/" + filename
-        return os.path.join(script_dir, rel_path)
+    # popup request to select jpg file
+    @staticmethod
+    def import_file():
+        root = Tk()
+        root.filename = filedialog.askopenfilename(
+            initialdir="/",
+            title="Select file",
+            filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")),
+        )
+        return root.filename
 
     # convert filename image to pixel matrix
-    def get_image(self, ext_filename="img_6.jpg"):
+    def get_image(self, ext_filename="images/img_6.jpg"):
         self.filename = ext_filename
-        filename_path = self.asset_path(self.filename)
-        img = Image.open(filename_path)
+        img = PImage.open(self.filename)
         self.current_width, self.current_height = img.size
         self.max_width = self.current_width
         self.max_height = self.current_height
@@ -146,10 +154,10 @@ class UserInput:
 
     # ask user for custom input
     @staticmethod
-    def user_input():
+    def user_input(input_string=""):
         usr_input = None
         while not usr_input:
-            usr_input = input("custom ASCII key: ")
+            usr_input = input(input_string)
         return usr_input
 
     # draw menu from menu_dict file
@@ -157,7 +165,7 @@ class UserInput:
         for key, value in menu_dict.menu.items():
             print(" {} ) for {}".format(key, value[0]))
 
-        self.input = self.user_input()
+        self.input = self.user_input("User ASCII characters: ")
 
     # check input for menu values
     def menu_function(self):
@@ -167,6 +175,8 @@ class UserInput:
                 print(self.input)
                 if self.input == "Q":
                     Action.quit()
+                elif self.input == "N":
+                    main()
                 else:
                     print(menu_dict.menu[self.input][1])
                     return menu_dict.menu[self.input][1]
@@ -182,7 +192,17 @@ def main():
 
     # init
     image = SelectImage()
-    image.get_image()
+    custom_image = SelectImage.import_file()
+    image.get_image(custom_image)
+
+    while True:
+        image_size = UserInput.user_input("Character Width: ")
+        if image_size.isnumeric():
+            image_size = int(image_size)
+            break
+
+    image.image_resize(image_size)
+
     image_ll = Action(image.image_to_ll())
     image_ll.make_bnw()
     image_ll.make_ascii()
@@ -195,21 +215,6 @@ def main():
         image_ll.make_ascii(ascii_string)
         image_ll.print_ascii()
 
-    # image.image_resize(70)
-
-    """
-    img = Image.open(asset_path("img_6.jpg"))
-    width, height = img.size
-    pixel_matrix = img.getdata()
-
-    colour_matrix = image_to_matrix(pixel_matrix, width, height, 80)
-    bnw_matrix = make_bnw(colour_matrix)
-    while True:
-        ascii_string = ascii_menu()
-        ascii_matrix = make_ascii(bnw_matrix, ascii_string)
-        print_img(ascii_matrix)
-    """
-
 
 if __name__ == "__main__":
     main()
@@ -219,16 +224,6 @@ else:
 
 """
 
-    # different ascii strings
-    # ascii_string = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi\{C\}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@"
-    # ascii_string = ("$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1\{\}[]?-_+~<>i!lI;:,\"^`'.")
-    # ascii_string = " .:-=+*#%@"
-    # ascii_string = "`.:~=+o*%8&#@O"
-    # ascii_string = "-=+*"
-    # ascii_string = ""
-    
-
-class select image
 
 
 class make image
